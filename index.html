@@ -4,22 +4,62 @@
         <meta charset="utf-8">
         <title>勉強用</title>
         <style>
-            table {
-              border-collapse: collapse;
-              width: 100%;
+            body{
+                font-family: Arial,sans-serif;
+                text-align: center;
+                background-color: #f4f4f4;
             }
             th, td {
               border: 1px solid black;
               padding: 8px;
               text-align: left;
+              width: auto;
+            }
+            table {
+              border-collapse: collapse;
+              width: 100%;
+            }
+            table th,table td{
+                padding: 20px;
             }
           </style>
     </head>
     <body>
-        <input type="file" id="csvFileInput" accept=".csv">
         <button onclick="loadFile()">参照</button>
-        <table id="csvTable">
+        <button onclick="EditFile()">編集</button>
+        <form name="myform">
+            <tb>
+            <input type="file" id="csvFileInput" accept=".csv"></input>
+            <tb>
+            <textarea name="outputTextArea" cols="80" rows="10"></textarea>
+        </form>
+        <table id="csvTable"></table>
+        
         <script>
+            var form =document.forms.myform;
+            form.addEventListener('change',function(e)
+            {
+                var result=e.target.files[0];
+                var reader=new FileReader();
+                reader.readAsText(result);
+                reader.addEventListener('load',function()
+                {
+                    var arr=[];
+                    var list=reader.result.split('/n');
+                    form.outputTextArea.textContent=reader.result.split(',');
+                    for(let i=0;i<list.length;i++)
+                    {
+                        arr[i]=list[i].split(',');
+                        console.log(arr);
+                        htmlWrite(arr);
+                    }
+                })
+            });
+
+            function EditFile(){
+
+            }
+
             function displaycsv(csvData){
                 const dataTable = document.getElementById('csvTable');
                 dataTable.innerHTML = ''; 
@@ -27,6 +67,7 @@
                 const rows = csvData.split ('\n');
                 rows.forEach(row => {
                     const cells = row.split(',');
+                    const cells2 = row.split(' ');
                     const tr = document.createElement('tr');
                     cells.forEach(cell =>{
                         const td = document.createElement('td');
@@ -47,6 +88,22 @@
                     displaycsv(csvData);
                 };
                 reader.readAsText(file);
+            }
+            function htmlWrite(dataList){
+                var insert = "";
+                dataList.forEach((element,index)=>{
+                    insert+='<tr>';
+                    element.forEach((childElement)=>{
+                        if(index==0){
+                            insert+='<th>'+childElement+'</th>';
+                        }
+                        else{
+                            insert+='<td>'+childElement+'</td>';
+                        }
+                    });
+                    insert+='</tr>';
+                });
+                dataTable.innerHTML=insert;
             }
         </script>
     </body>
